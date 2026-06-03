@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { registerUser } from '@/lib/api';
 
 export default function RegisterPage() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,15 +20,12 @@ export default function RegisterPage() {
     setError('');
     setSuccess('');
 
-    const data = await registerUser(email, password);
-
-    // data.message && !data.error: Your backend returns a message field on both success and failure. This 
-    // check distinguishes between the two — if there's a message but no error field, it was successful.
+    const data = await registerUser(name, email, password);
 
     if (data.message && !data.error) {
       setSuccess('Account created! Please check your email to verify your account.');
     } else {
-      setError(data.message || 'Registration failed');
+      setError(data.error || 'Registration failed');
     }
 
     setLoading(false);
@@ -40,6 +38,18 @@ export default function RegisterPage() {
         <p className="text-muted-foreground mb-6">Start tracking your spare change today</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-1 block">Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-3 py-2 rounded-md border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              placeholder="Your name"
+              required
+            />
+          </div>
+
           <div>
             <label className="text-sm font-medium mb-1 block">Email</label>
             <input
@@ -64,13 +74,8 @@ export default function RegisterPage() {
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
-
-          {success && (
-            <p className="text-sm text-green-600">{success}</p>
-          )}
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          {success && <p className="text-sm text-green-600">{success}</p>}
 
           <button
             type="submit"
@@ -83,9 +88,7 @@ export default function RegisterPage() {
 
         <p className="text-sm text-muted-foreground mt-4 text-center">
           Already have an account?{' '}
-          <a href="/login" className="text-primary hover:underline">
-            Sign in
-          </a>
+          <a href="/login" className="text-primary hover:underline">Sign in</a>
         </p>
       </div>
     </div>

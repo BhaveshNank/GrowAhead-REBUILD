@@ -1,3 +1,4 @@
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
 
 function getToken() {
@@ -12,11 +13,11 @@ function authHeaders() {
 }
 
 // Auth
-export async function registerUser(email: string, password: string) {
+export async function registerUser(name: string, email: string, password: string) {
   const res = await fetch(`${BASE_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ name, email, password }),
   });
   return res.json();
 }
