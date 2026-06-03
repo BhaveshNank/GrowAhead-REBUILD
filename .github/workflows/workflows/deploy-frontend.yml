@@ -1,0 +1,15 @@
+name: Deploy Frontend to Vercel
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trigger Vercel deploy
+        run: echo "Vercel auto-deploys from GitHub. No manual trigger needed."
