@@ -51,7 +51,7 @@ router.post('/register', async (req, res) => {
       from: 'noreply@growahead.com',
       to: email,
       subject: 'Verify your GrowAhead account',
-      html: `<p>Click <a href="http://localhost:5001/api/auth/verify?token=${verificationToken}">here</a> to verify your account.</p>`,
+      html: `<p>Click <a href="${process.env.BACKEND_URL}/api/auth/verify?token=${verificationToken}">here</a> to verify your account.</p>`,
     });
 
     res.status(201).json({ message: 'Registered successfully. Please verify your email.' });
