@@ -1,0 +1,62 @@
+name: Deploy Backend to Render
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: growahead_test
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: Backend
+        run: npm install
+
+      - name: Run database schema
+        working-directory: Backend
+        env:
+          PGPASSWORD: testpassword
+        run: psql -h localhost -U testuser -d growahead_test -f database/schema.sql
+
+      - name: Run tests
+        working-directory: Backend
+        env:
+          PORT: 5002
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: growahead_test
+          DB_USER: testuser
+          DB_PASSWORD: testpassword
+          JWT_SECRET: test_jwt_secret_key
+          EMAIL_HOST: sandbox.smtp.mailtrap.io
+          EMAIL_USER: test
+          EMAIL_PASS: test
+          BACKEND_URL: http://localhost:5002
+        run: npm test
+
+      - name: Trigger Render deploy
+        run: curl "${{ secrets.RENDER_DEPLOY_HOOK }}"
